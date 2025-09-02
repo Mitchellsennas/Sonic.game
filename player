@@ -1,42 +1,69 @@
-#pragma once
-#include "Enemy.h"
-#include <SFML/Graphics.hpp>
+#include "Player.h"
+#include <SFML/Window.hpp>
+#include <cmath>
 
-class Player : public Character {
-public:
-    Player();
-    void update(float dt) override;
-    void draw(sf::RenderWindow& win) override;
-    sf::FloatRect bounds() const override;
+Player::Player() {
+    body.setRadius(20.f);
+    body.setOrigin(20.f, 20.f);
+    body.setFillColor(sf::Color::Blue);
+    pos = {200.f, 420.f};
 
-    bool isDescending() const;
-    void bounce();
-    void hurt(const sf::Vector2f& knock);
+    // Green floating label
+    if (font.loadFromFile("assets/arial.ttf")) {
+        label.setFont(font);
+        label.setCharacterSize(14);
+        label.setFillColor(sf::Color::Green);
+        label.setString("Player: Sonic-like\nUse arrows or WASD + Space");
+    }
+}
 
-    int  getHP() const;
-    int  getScore() const;
-    void addScore(int s);
-    bool canJump() const;
-    bool isAlive() const;
-    sf::Vector2f center() const;
+void Player::handleInput(float dt) {
+    vel.x = 0.f;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) vel.x -= moveSpeed;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) vel.x += moveSpeed;
+    if ((sf::Keyboard::isKeyPressed(sf::Keyboard::W) ||
+         sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
+         sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) && onGround) {
+        vel.y = -jumpSpeed;
+        onGround = false;
+    }
+}
 
-private:
-    void handleInput(float dt);
-    void applyPhysics(float dt);
+void Player::applyPhysics(float dt) {
+    vel.y += gravity * dt;
+    pos += vel * dt;
+    if (pos.y > 420) { pos.y = 420; vel.y = 0; onGround = true; }
+}
 
-    sf::CircleShape body;
-    sf::Vector2f pos, vel;
-    float spinAngle = 0.f;
+void Player::update(float dt) {
+    handleInput(dt);
+    applyPhysics(dt);
 
-    const float moveSpeed = 260.f;
-    const float jumpSpeed = 520.f;
-    const float gravity   = 1400.f;
+    body.setPosition(pos);
+    spinAngle += 720.f * dt;
+    body.setRotation(spinAngle);
 
-    bool onGround = true;
-    int hp = 3, score = 0;
-    float invulnTimer = 0.f;
+    if (invulnTimer > 0) invulnTimer -= dt;
 
-    sf::Font font;
-    sf::Text label; // green floating text
-};
+    label.setPosition(pos.x - 40, pos.y - 60);
+}
+
+void Player::draw(sf::RenderWindow& win) {
+    win.draw(body);
+    win.draw(label);
+}
+
+sf::FloatRect Player::bounds() const { return body.getGlobalBounds(); }
+bool Player::isDescending() const { return vel.y > 0.f; }
+void Player::bounce() { vel.y = -jumpSpeed * 0.6f; }
+void Player::hurt(const sf::Vector2f& knock) { 
+    if (invulnTimer <= 0) { hp--; vel = knock; invulnTimer = 1.5f; } 
+}
+int Player::getHP() const { return hp; }
+int Player::getScore() const { return score; }
+void Player::addScore(int s) { score += s; }
+bool Player::canJump() const { return onGround; }
+bool Player::isAlive() const { return hp > 0; }
+sf::Vector2f Player::center() const { return pos; }
+
 
