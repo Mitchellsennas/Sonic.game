@@ -1,0 +1,33 @@
+#include "MotoBug.h"
+#include "Player.h"
+
+MotoBug::MotoBug(sf::Vector2f start, float leftX, float rightX)
+    : pos(start), leftBound(leftX), rightBound(rightX) {
+    body.setSize({40, 20});
+    body.setOrigin(20, 10);
+    body.setFillColor(sf::Color::Red);
+    body.setPosition(pos);
+
+    // Green label setup
+    if (font.loadFromFile("arial.ttf")) {
+        label.setFont(font);
+        label.setCharacterSize(14);
+        label.setFillColor(sf::Color::Green);
+        label.setString("MotoBug:\nWalks back and forth");
+    }
+}
+
+void MotoBug::update(float dt) {
+    pos.x += dir * speed * dt;
+    if (pos.x < leftBound || pos.x > rightBound) dir *= -1;
+    body.setPosition(pos);
+
+    // Position label above enemy
+    label.setPosition(pos.x - 40, pos.y - 40);
+}
+
+void MotoBug::draw(sf::RenderWindow& w) {
+    w.draw(body);
+    w.draw(label);
+}
+
