@@ -31,3 +31,4 @@ void MotoBug::draw(sf::RenderWindow& w) {
 }
 
 sf::FloatRect MotoBug::bounds() const { return body.getGlobalBounds(); }
+:FloatRect MotoBug::bounds() const { return body.getGlobalBounds(); }
