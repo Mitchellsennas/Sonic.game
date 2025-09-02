@@ -16,10 +16,19 @@ Level::Level() {
         plat.setPosition(250.f + i*300.f, height - 200.f - i*30.f);
         platforms.push_back(plat);
     }
+
+    // Goal flag at the far right
+    goal.setSize({40, 80});                    // flag size
+    goal.setFillColor(sf::Color::Green);       // green color
+    goal.setPosition(width - 60, height - 180); // place on top of ground
 }
 
 void Level::draw(sf::RenderWindow& window){
+    // Draw all platforms
     for(auto& p : platforms) window.draw(p);
+
+    // Draw goal flag
+    window.draw(goal);
 }
 
 void Level::spawnEnemies(std::vector<std::unique_ptr<Enemy>>& enemies){
@@ -29,4 +38,9 @@ void Level::spawnEnemies(std::vector<std::unique_ptr<Enemy>>& enemies){
     enemies.emplace_back(std::make_unique<MotoBug>(sf::Vector2f(1200, height - 120), 1150, 1250));
     enemies.emplace_back(std::make_unique<BuzzBomber>(sf::Vector2f(1500, height - 250), 50, 2.5, 1450, 1550));
     enemies.emplace_back(std::make_unique<CrabMeat>(sf::Vector2f(1800, height - 120), 50));
+}
+
+// Getter for goal collision
+sf::FloatRect Level::getGoalBounds() const {
+    return goal.getGlobalBounds();
 }
