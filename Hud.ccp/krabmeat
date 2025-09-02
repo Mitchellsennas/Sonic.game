@@ -1,0 +1,38 @@
+CrabMeat::CrabMeat(sf::Vector2f start, float guardRadius)
+    : pos(start), guardR(guardRadius) {
+    body.setSize({40, 20});
+    body.setOrigin(20, 10);
+    body.setFillColor(sf::Color::Magenta);
+    body.setPosition(pos);
+
+    claw.setSize({10, 10});
+    claw.setFillColor(sf::Color::White);
+
+    // Green label
+    if (font.loadFromFile("arial.ttf")) {
+        label.setFont(font);
+        label.setCharacterSize(14);
+        label.setFillColor(sf::Color::Green);
+        label.setString("CrabMeat:\nGuards its zone");
+    }
+}
+
+void CrabMeat::update(float dt) {
+    timer += dt;
+    if (timer > 2.f) { faceLeft = !faceLeft; timer = 0.f; }
+
+    float dir = faceLeft ? -1.f : 1.f;
+    pos.x += dir * 50.f * dt;
+    if (std::abs(pos.x - body.getPosition().x) > guardR) pos.x = body.getPosition().x;
+
+    body.setPosition(pos);
+    claw.setPosition(pos.x + (faceLeft ? -30.f : 30.f), pos.y - 10.f);
+
+    label.setPosition(pos.x - 40, pos.y - 40);
+}
+
+void CrabMeat::draw(sf::RenderWindow& w) {
+    w.draw(body);
+    w.draw(claw);
+    w.draw(label);
+}
