@@ -1,12 +1,16 @@
+#include "BuzzBomber.h"
+#include <cmath>
+
 BuzzBomber::BuzzBomber(sf::Vector2f start, float amplitude, float period, float xMin, float xMax)
     : base(start), pos(start), amp(amplitude), per(period), xL(xMin), xR(xMax) {
+
     body.setRadius(15.f);
     body.setOrigin(15.f, 15.f);
     body.setFillColor(sf::Color::Yellow);
     body.setPosition(pos);
 
     // Green label
-    if (font.loadFromFile("arial.ttf")) {
+    if (font.loadFromFile("assets/arial.ttf")) {
         label.setFont(font);
         label.setCharacterSize(14);
         label.setFillColor(sf::Color::Green);
@@ -19,8 +23,8 @@ void BuzzBomber::update(float dt) {
     pos.y = base.y + std::sin(t * 2 * 3.14159f / per) * amp;
     pos.x += horizSpeed * dt * direction;
     if (pos.x < xL || pos.x > xR) direction *= -1;
-    body.setPosition(pos);
 
+    body.setPosition(pos);
     label.setPosition(pos.x - 40, pos.y - 40);
 }
 
@@ -28,3 +32,5 @@ void BuzzBomber::draw(sf::RenderWindow& w) {
     w.draw(body);
     w.draw(label);
 }
+
+sf::FloatRect BuzzBomber::bounds() const { return body.getGlobalBounds(); }
