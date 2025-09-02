@@ -1,18 +1,18 @@
 #pragma once
 #include "Enemy.h"
 
-class MotoBug : public Enemy {
+class BuzzBomber : public Enemy {
 public:
-    MotoBug(sf::Vector2f start, float leftX, float rightX);
+    BuzzBomber(sf::Vector2f start, float amplitude, float period, float xMin, float xMax);
     void update(float dt) override;
     void draw(sf::RenderWindow& w) override;
     sf::FloatRect bounds() const override;
     sf::Vector2f center() const override { return pos; }
 
 private:
-    sf::RectangleShape body;
-    sf::Vector2f pos;
-    float leftBound, rightBound;
-    float dir = 1.f, speed = 110.f;
+    sf::CircleShape body;
+    sf::Vector2f base, pos;
+    float amp, per, xL, xR;
+    float t = 0.f, direction = 1.f, horizSpeed = 120.f;
 };
 
