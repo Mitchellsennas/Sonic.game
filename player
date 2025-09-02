@@ -1,38 +1,40 @@
-#pragma once
-#include <SFML/Graphics.hpp>
+#include "Player.h"
+#include <SFML/Window.hpp>
+#include <cmath>
 
-class Player {
-public:
-    Player();
-    void update(float dt);
-    void draw(sf::RenderWindow& win);
-    sf::FloatRect bounds() const;
-    bool isDescending() const;
-    void bounce();
-    void hurt(const sf::Vector2f& knock);
-    int getHP() const;
-    int getScore() const;
-    void addScore(int s);
-    bool canJump() const;
-    bool isAlive() const;
-    sf::Vector2f center() const;
+Player::Player() {
+    body.setRadius(20.f);
+    body.setOrigin(20.f, 20.f);
+    body.setFillColor(sf::Color::Blue);
+    pos = {200.f, 200.f};
 
-private:
-    void handleInput(float dt);
-    void applyPhysics(float dt);
+    // Setup green label
+    if (font.loadFromFile("arial.ttf")) {
+        label.setFont(font);
+        label.setCharacterSize(14);
+        label.setFillColor(sf::Color::Green);
+        label.setString("Player: Sonic-like\nUse arrows or WASD + Space");
+    }
+}
 
-    sf::CircleShape body;
-    sf::Vector2f pos, vel;
-    float spinAngle = 0.f;
-    bool onGround = true;
-    int hp = 3, score = 0;
-    float invulnTimer = 0.f;
+...
 
-    // Green floating label
-    sf::Font font;
-    sf::Text label;
+void Player::update(float dt) {
+    handleInput(dt);
+    applyPhysics(dt);
+    body.setPosition(pos);
 
-    const float moveSpeed = 260.f;
-    const float jumpSpeed = 520.f;
-    const float gravity   = 1400.f;
-};
+    spinAngle += 720.f * dt;
+    body.setRotation(spinAngle);
+
+    if (invulnTimer > 0) invulnTimer -= dt;
+
+    // Position label above player
+    label.setPosition(pos.x - 40, pos.y - 60);
+}
+
+void Player::draw(sf::RenderWindow& win) {
+    win.draw(body);
+    win.draw(label); // Draw green text
+}
+
