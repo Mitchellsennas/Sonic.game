@@ -1,0 +1,39 @@
+#include "Player.h"
+#include <SFML/Window.hpp>
+#include <cmath>
+
+Player::Player() {
+    body.setRadius(20.f);
+    body.setOrigin(20.f, 20.f);
+    body.setFillColor(sf::Color::Blue);
+    pos = {200.f, 200.f};
+
+    // Setup green label
+    if (font.loadFromFile("arial.ttf")) {
+        label.setFont(font);
+        label.setCharacterSize(14);
+        label.setFillColor(sf::Color::Green);
+        label.setString("Player: Sonic-like\nUse arrows or WASD + Space");
+    }
+}
+
+...
+
+void Player::update(float dt) {
+    handleInput(dt);
+    applyPhysics(dt);
+    body.setPosition(pos);
+
+    spinAngle += 720.f * dt;
+    body.setRotation(spinAngle);
+
+    if (invulnTimer > 0) invulnTimer -= dt;
+
+    // Position label above player
+    label.setPosition(pos.x - 40, pos.y - 60);
+}
+
+void Player::draw(sf::RenderWindow& win) {
+    win.draw(body);
+    win.draw(label); // Draw green text
+}
